@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace API.DataAgents
 {
@@ -106,5 +107,15 @@ namespace API.DataAgents
         {
             return new SqlConnection(GetConfiguration.GetAppSettings().Build().GetSection("ConnectionStrings").Get<string>());
         }
+
+        public TransactionScope CreateTransactionScope()
+        {
+            return (new TransactionScope(TransactionScopeOption.Required, new TransactionOptions()
+            {
+                IsolationLevel = System.Transactions.IsolationLevel.ReadCommitted,
+                Timeout = TransactionManager.MaximumTimeout
+            }));
+        }
+
     }
 }
