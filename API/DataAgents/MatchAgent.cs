@@ -21,8 +21,7 @@ namespace API.DataAgents
 
         public Identity CreateMatch(Match match)
         {
-            Identity addedMatch = DataContext.ExecuteInsertFromQuery("Match/CreateMatch", 
-                      match.TimeStart
+            Identity addedMatch = DataContext.ExecuteInsertFromQuery("Match/CreateMatch"
                     , match.Home_Color
                     , match.Home_Score
                     , match.Status
@@ -38,5 +37,19 @@ namespace API.DataAgents
             return addedMatch;
         }
 
+        public int GetMatchStatus(int matchId)
+        {
+            return (DataContext.ExecuteQuery<int>("Match/GetMatchStatus", matchId).FirstOrDefault());
+        }
+
+        public void BeginMatch(int matchId)
+        {
+            DataContext.ExecuteCommand("Match/BeginMatch", matchId);
+        }
+
+        public Match[] GetPendingMatchs(int userID)
+        {
+            return (DataContext.ExecuteQuery<Match>("Match/GetPendingMatchs", userID).ToArray());
+        }
     }
 }

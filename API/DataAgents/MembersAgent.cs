@@ -1,4 +1,5 @@
 ﻿using API.Models;
+using API.Models.Members;
 using API.Models.Teams;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace API.DataAgents
               : base(agent) { }
 
 
-        public TeamMember[] CreateTeamMembers(TeamMember[] members, int? matchId, int? teamId)
+        public TeamMember[] CreateTeamMembers(TeamMember[] members, int? matchId, int? teamId, MemberType memberType)
         {
             List<TeamMember> teamMembers = new List<TeamMember>();
 
@@ -33,14 +34,15 @@ namespace API.DataAgents
                     // Add team Member 
                     var teamMemberId = CreateTeamMember(teamId.Value, memberId, member);
                     // Add match Member
-                    var matchMember = CreateMatchMember(matchId.Value, memberId, "Player");
+                    var matchMember = CreateMatchMember(matchId.Value, memberId, memberType.ToString());
 
-                    if (memberId.Id == 0 || teamMemberId == null)
+                    if (memberId.Id == 0 || teamMemberId.Id == 0|| matchMember.Id == 0)
                     {
                         valid = false;
                     }
                     else
                     {
+                        member.MemberID = memberId;
                         teamMembers.Add(member);
                     }
                 }
