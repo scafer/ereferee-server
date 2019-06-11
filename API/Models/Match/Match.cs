@@ -9,7 +9,7 @@ namespace API.Models.Match
     {
         public int? MatchId { get; set; }
         public DateTime TimeStart { get; set; }
-        public DateTime TimeEnd { get; set; }
+        public DateTime? TimeEnd { get; set; }
         public int? Home_Score { get; set; }
         public string Home_Color { get; set; }
         public int? Visitor_Score { get; set; }

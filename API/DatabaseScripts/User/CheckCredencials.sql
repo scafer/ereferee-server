@@ -5,7 +5,7 @@ SET @username       = {0}
 SET @email          = {1}
 
 SELECT CASE
-    WHEN EXISTS (SELECT TOP 1 * FROM [dbo].[Users]
+    WHEN EXISTS (SELECT TOP 1 * FROM [dbo].[Users] WITH(NOLOCK)
                     WHERE Username = @username
                     AND Email = @email) THEN 1
         ELSE 0
