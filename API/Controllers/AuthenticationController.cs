@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    [Route("api/Auth/")]
-    public class AuthenticationController
+    [Route("api/auth/")]
+    public class AuthenticationController : ControllerBase
     {
         AuthService authService = new AuthService();
 
@@ -29,7 +29,7 @@ namespace API.Controllers
             
             if (user != null)
             {
-                var tokenString = authService.GetAuthData(user.Username);
+                var tokenString = authService.GetAuthData(user.UserID);
                 return tokenString;
             }
 
@@ -41,62 +41,26 @@ namespace API.Controllers
         [AllowAnonymous]
         public ActionResult<string> SignUp(User user)
         {
-            using (var agent = new AuthenticationAgent())
+            using (var agent = new UserAgent())
             {
-                var checkEmail = agent.CheckEmailExist(user.Email);
-                if (checkEmail) return "Email already in use.";
-
-                var checkUsername = agent.CheckUsernameExist(user.Username);
-                if (checkUsername) return "Username already in use.";
-
-                bool userAdded = agent.SignUpUser(user);
-
-                if (!userAdded)
+                using (var authAgent = new AuthenticationAgent(agent))
                 {
-                    return "An error occurred while adding the user.";
+
+                    var checkEmail = agent.CheckEmailExist(user.Email);
+                    if (checkEmail) return "Email already in use.";
+
+                    var checkUsername = agent.CheckUsernameExist(user.Username);
+                    if (checkUsername) return "Username already in use.";
+
+                    bool userAdded = authAgent.SignUpUser(user);
+
+                    if (!userAdded)
+                    {
+                        return "An error occurred while adding the user.";
+                    }
+
+                    return "User added succefuly";
                 }
-
-                return "User added succefuly";
-            }
-        }
-
-        [HttpPost]
-        [Route("resetPassword")]
-        [AllowAnonymous]
-        public ActionResult<string> ResetPassword(string username, string email)
-        {
-            using (var agent = new AuthenticationAgent())
-            {
-                var checkCredencials = agent.CheckCredencials(username, email);
-
-                if (!checkCredencials) return "Username or Email invalid.";
-
-                string passwordReset = agent.ResetPassword(username, email);
-
-                var sendEmail = agent.SendEmailToUser(username, email, passwordReset);
-
-                return "User added succefuly";
-            }
-        }
-
-        [HttpPost]
-        [Route("changePassword")]
-        [Authorize]
-        public ActionResult<string> ChangePassword(string username, string oldPassword, string newPassword)
-        {
-            using (var agent = new AuthenticationAgent())
-            {
-                var user = agent.GetUser(username);
-
-                if (user == null) return "Username is invalid.";
-
-                bool samePassword = authService.VerifyPassword(oldPassword, user.Password);
-
-                if (!samePassword) return "The password invalid.";
-
-                var sendEmail = agent.ChangePassword(username, user.Email, newPassword);
-
-                return "Password changed succefuly";
             }
         }
     }

@@ -22,50 +22,33 @@ namespace API.DataAgents
         public TeamMember[] CreateTeamMembers(TeamMember[] members, int? matchId, int? teamId, MemberType memberType)
         {
             List<TeamMember> teamMembers = new List<TeamMember>();
-
-            using (var t = CreateTransactionScope())
+                       
+            foreach (var member in members)
             {
-                var valid = true;
+                // Add member 
+                var memberId = CreateMember(member.Name);
+                // Add team Member 
+                CreateTeamMember(teamId.Value, memberId, member);
+                // Add match Member
+                CreateMatchMember(matchId.Value, memberId, (int)memberType);
 
-                foreach (var member in members)
+                if (memberId.Id == 0)
                 {
-                    // Add member 
-                    var memberId = CreateMember(member.Name);
-                    // Add team Member 
-                    var teamMemberId = CreateTeamMember(teamId.Value, memberId, member);
-                    // Add match Member
-                    var matchMember = CreateMatchMember(matchId.Value, memberId, memberType.ToString());
-
-                    if (memberId.Id == 0 || teamMemberId.Id == 0|| matchMember.Id == 0)
-                    {
-                        valid = false;
-                    }
-                    else
-                    {
-                        member.MemberID = memberId;
-                        teamMembers.Add(member);
-                    }
+                    return null;
                 }
-
-                if (valid)
+                else
                 {
-                    t.Complete();
+                    member.MemberID = memberId;
+                    teamMembers.Add(member);
                 }
             }
 
             return teamMembers.ToArray();
         }
 
-        private Identity CreateMatchMember(int matchId, int memberId, string reg)
+        private void CreateMatchMember(int matchId, int memberId, int memberType)
         {
-            Identity matchMember = DataContext.ExecuteInsertFromQuery("Match/CreateMatchMember", matchId, memberId, reg);
-
-            if (matchMember == 0)
-            {
-                return null;
-            }
-
-            return matchMember;
+            DataContext.ExecuteInsertFromQuery("Match/CreateMatchMember", matchId, memberId, memberType);
         }
 
         public Identity CreateMember(string name)
@@ -80,16 +63,14 @@ namespace API.DataAgents
             return addedMember;
         }
 
-        public Identity CreateTeamMember(int matchId, int teamId, TeamMember teamMember)
+        public void CreateTeamMember(int teamId, int memberId, TeamMember teamMember)
         {
-            Identity addedMember = DataContext.ExecuteInsertFromQuery("Team/CreateTeamMember", matchId, teamId, teamMember.Status, teamMember.Role, teamMember.Number);
-
-            if (addedMember == 0)
-            {
-                return null;
-            }
-
-            return addedMember;
+           DataContext.ExecuteInsertFromQuery("Team/CreateTeamMember", teamId, memberId, teamMember.Status, teamMember.Role, teamMember.Number);
         }
+
+        //public TeamMember[] GetTeamMembersByMatchId(int matchId)
+        //{
+
+        //}
     }
 }

@@ -16,9 +16,7 @@ INSERT INTO [dbo].[team_member]
            ,[memberId]
            ,[status]
            ,[role]
-           ,[number]
-           ,[dayStart]
-           ,[dayEnd])
+           ,[number])
      VALUES 
            ( @teamId
 		   , @memberId

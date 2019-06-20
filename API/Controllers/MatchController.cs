@@ -1,6 +1,8 @@
 ﻿using API.DataAgents;
+using API.Extensions;
 using API.Models;
 using API.Models.Match;
+using API.Models.MatchEvents;
 using API.Models.Members;
 using API.Models.Teams;
 using Microsoft.AspNetCore.Authorization;
@@ -13,15 +15,23 @@ using System.Threading.Tasks;
 namespace API.Controllers
 {
     [Route("api/match/")]
-    public class MatchController
+    public class MatchController : ControllerBase
     {
         [HttpPost]
         [Route("createMatch")]
         [Authorize]
-        public ActionResult<MatchWithTeams> CreateMatch(MatchWithTeams matchWithTeams)
+        [DisableRequestSizeLimit]
+        public ActionResult<MatchWithTeamsAndMembers> CreateMatch([FromBody]MatchWithTeamsAndMembers matchWithTeams)
         {
+            var user = User.GetUser();
+
+            if (user == null)
+            {
+                return new NotFoundResult();
+            }
+
             if (matchWithTeams.Match != null && matchWithTeams.HomeTeam != null && matchWithTeams.VisitorTeam != null
-                && matchWithTeams.HomeMembers.Length == 0 && matchWithTeams.VisitorMembers.Length == 0)
+                && matchWithTeams.HomeMembers.Length != 0 && matchWithTeams.VisitorMembers.Length != 0)
             {
                 using (var teamAgent = new TeamsAgent())
                 {
@@ -38,11 +48,11 @@ namespace API.Controllers
                                 return new NoContentResult();
                             }
 
-                            matchWithTeams.HomeTeam.TeamId = homeTeamId;
-                            matchWithTeams.VisitorTeam.TeamId = visitorTeamId;
+                            matchWithTeams.HomeTeam.TeamId = matchWithTeams.Match.HomeTeamId = homeTeamId;
+                            matchWithTeams.VisitorTeam.TeamId = matchWithTeams.Match.VisitorId = visitorTeamId;
 
                             // Create Match
-                            var matchId = matchAgent.CreateMatch(matchWithTeams.Match);
+                            var matchId = matchAgent.CreateMatch(matchWithTeams.Match, user.UserID);
 
                             if (matchId == null)
                             {
@@ -55,13 +65,16 @@ namespace API.Controllers
                             var homeTeamMembers = membersAgent.CreateTeamMembers(matchWithTeams.HomeMembers, matchWithTeams.Match.MatchId, matchWithTeams.HomeTeam.TeamId, MemberType.Player);
                             var visitorTeamMembers = membersAgent.CreateTeamMembers(matchWithTeams.VisitorMembers, matchWithTeams.Match.MatchId, matchWithTeams.VisitorTeam.TeamId, MemberType.Player);
 
-                            if (homeTeamMembers.Length == 0 || visitorTeamMembers.Length == 0)
+                            if (homeTeamMembers == null || visitorTeamMembers == null)
                             {
                                 return new NoContentResult();
                             }
 
+                            matchWithTeams.Match.MatchOwnerId = user.UserID;
                             matchWithTeams.HomeMembers = homeTeamMembers;
                             matchWithTeams.VisitorMembers = visitorTeamMembers;
+
+                            matchAgent.AssociateUserToMatch(user.UserID, matchId, 1);
 
                             return matchWithTeams;
                         }
@@ -77,17 +90,22 @@ namespace API.Controllers
         [Authorize]
         public ActionResult<bool> BeginMatch(int matchId)
         {
+            var user = User.GetUser();
+
+            if (user == null)
+            {
+                return new NotFoundResult();
+            }
+
             if (matchId != 0)
             {
                 using (var matchAgent = new MatchAgent())
                 {
-
                     // Validate the MatchId if exists and if is not began already
                     var status = matchAgent.GetMatchStatus(matchId);
 
                     if (status == 0)
                     {
-                        // If not the iniciate the match with the current timne
                         matchAgent.BeginMatch(matchId);
 
                         return true;
@@ -99,10 +117,42 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [Route("finishMatch")]
+        [Authorize]
+        public ActionResult<bool> FinishMatch(int matchId, int homeScore, int visitorScore)
+        {
+            var user = User.GetUser();
+
+            if (user == null)
+            {
+                return new NotFoundResult();
+            }
+
+            if (matchId != 0)
+            {
+                using (var matchAgent = new MatchAgent())
+                {
+                    var status = matchAgent.GetMatchStatus(matchId);
+
+                    if (status == 1)
+                    {
+                        matchAgent.FinishMatch(matchId, homeScore, visitorScore);
+
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        [HttpGet]
         [Route("getPendingMatchs")]
         [Authorize]
-        public ActionResult<Match[]> GetPendingMatchs(User user)
+        public ActionResult<List<MatchWithTeams>> GetPendingMatchs()
         {
+            var user = User.GetUser();
+
             if (user != null)
             {
                 using (var matchAgent = new MatchAgent())
@@ -111,7 +161,82 @@ namespace API.Controllers
                 }
             }
 
-            return null;
+            return new NotFoundResult();
+        }
+
+        [HttpGet]
+        [Route("getPendingMatchByID")]
+        [Authorize]
+        public ActionResult<MatchWithTeamsAndMembers> GetPendingMatchByID(int matchID)
+        {
+            var user = User.GetUser();
+
+            if (user != null)
+            {
+                using (var matchAgent = new MatchAgent())
+                {
+                    return matchAgent.GetPendingMatchInfoByID(matchID);
+                }
+            }
+
+            return new NotFoundResult();
+        }
+
+        [HttpGet]
+        [Route("getPreviousMatchs")]
+        [Authorize]
+        public ActionResult<List<MatchWithTeams>> GetPreviousMatchs()
+        {
+            var user = User.GetUser();
+
+            if (user != null)
+            {
+                using (var matchAgent = new MatchAgent())
+                {
+                    return matchAgent.GetPreviousMatchs(user.UserID);
+                }
+            }
+
+            return new NotFoundResult();
+        }
+
+        [HttpGet]
+        [Route("getPreviousMatchByID")]
+        [Authorize]
+        public ActionResult<PreviousMatch> GetPreviousMatchByID(int matchID)
+        {
+            var user = User.GetUser();
+
+            if (user != null)
+            {
+                using (var matchAgent = new MatchAgent())
+                {
+                    return matchAgent.GetPreviousMatchByID(matchID);
+                }
+            }
+
+            return new NotFoundResult();
+        }
+
+
+        [HttpPost]
+        [Route("createMatchEvents")]
+        [Authorize]
+        public ActionResult<bool> CreateMatchEvents(MatchEventsType eventType, int matchID, int? teamId, int? memberId, string description)
+        {
+            var user = User.GetUser();
+
+            if (user != null)
+            {
+                using (var matchAgent = new MatchAgent())
+                {
+                    matchAgent.CreateMatchEvent(eventType, matchID, teamId, memberId, description);
+
+                    return true;
+                }
+            }
+
+            return new NotFoundResult();
         }
     }
 }

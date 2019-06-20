@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Principal;
+using Microsoft.IdentityModel.Logging;
 
 namespace API.Services
 {
@@ -25,7 +27,7 @@ namespace API.Services
             this.jwtSecret = _settings.SigningKey;
         }
 
-        public AuthData GetAuthData(string id)
+        public AuthData GetAuthData(int id)
         {
             var expirationTime = DateTime.UtcNow.AddMinutes(jwtLifeSpan);
 
@@ -33,7 +35,7 @@ namespace API.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, id)
+                    new Claim(ClaimTypes.NameIdentifier, id.ToString())
                 }),
                 Expires = expirationTime,
                 SigningCredentials = new SigningCredentials(
@@ -52,7 +54,7 @@ namespace API.Services
             {
                 Token = token,
                 TokenExpirationTime = ((DateTimeOffset)expirationTime).ToUnixTimeSeconds(),
-                Id = id
+                Id = id.ToString()
             };
         }
 
