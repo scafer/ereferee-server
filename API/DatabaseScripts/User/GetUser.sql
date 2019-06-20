@@ -2,5 +2,9 @@
 
 SET @username = {0}
 
-SELECT * FROM [dbo].[Users] WITH(NOLOCK)
+SELECT [userId]
+      ,[username]
+      ,[email]
+	  ,[password]
+FROM [dbo].[Users] WITH(NOLOCK)
 WHERE Username = @username

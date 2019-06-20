@@ -29,5 +29,10 @@ namespace API.DataAgents
 
             return addedTeam;
         }
+
+        public Team GetTeam(int teamId)
+        {
+            return DataContext.ExecuteQuery<Team>("Team/GetTeam", teamId).FirstOrDefault();
+        }
     }
 }

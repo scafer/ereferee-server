@@ -1,5 +1,5 @@
 ﻿DECLARE @name NVARCHAR(250)
-DECLARE @color NVARCHAR(250)
+DECLARE @color NVARCHAR(512)
 
 SET @name = {0}
 SET @color = {1}

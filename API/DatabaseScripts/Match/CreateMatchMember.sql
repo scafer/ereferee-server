@@ -1,6 +1,6 @@
 ﻿DECLARE @matchId int
 DECLARE @memberId int
-DECLARE @reg nvarchar(50)
+DECLARE @reg int
 
 SET @matchId  = {0}
 SET @memberId  = {1}

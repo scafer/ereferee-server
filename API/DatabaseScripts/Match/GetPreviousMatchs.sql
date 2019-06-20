@@ -4,4 +4,4 @@ SET @userId = {0}
 
 SELECT * FROM matches WITH(NOLOCK)
 WHERE matchOwnerId = @userId
-AND [status] = 0
+AND [status] = 2
