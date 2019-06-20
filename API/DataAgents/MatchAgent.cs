@@ -93,8 +93,8 @@ namespace API.DataAgents
 
                     matchWithTeamsAndMembers.Match = DataContext.ExecuteQuery<Match>("Match/GetPendingMatchByID", matchId).FirstOrDefault();
 
-                    matchWithTeamsAndMembers.HomeTeam = agent.GetTeam(matchId);
-                    matchWithTeamsAndMembers.VisitorTeam = agent.GetTeam(matchId);
+                    matchWithTeamsAndMembers.HomeTeam = agent.GetTeam(matchWithTeamsAndMembers.Match.HomeTeamId.Value);
+                    matchWithTeamsAndMembers.VisitorTeam = agent.GetTeam(matchWithTeamsAndMembers.Match.VisitorId.Value);
 
                     matchWithTeamsAndMembers.HomeMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", matchWithTeamsAndMembers.HomeTeam.TeamId).ToArray();
                     matchWithTeamsAndMembers.VisitorMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", matchWithTeamsAndMembers.VisitorTeam.TeamId).ToArray();
@@ -138,8 +138,8 @@ namespace API.DataAgents
 
                     previousMatch.Match = DataContext.ExecuteQuery<Match>("Match/GetPreviousMatchsByID", matchID).FirstOrDefault();
 
-                    previousMatch.HomeTeam = agent.GetTeam(matchID);
-                    previousMatch.VisitorTeam = agent.GetTeam(matchID);
+                    previousMatch.HomeTeam = agent.GetTeam(previousMatch.Match.HomeTeamId.Value);
+                    previousMatch.VisitorTeam = agent.GetTeam(previousMatch.Match.HomeTeamId.Value);
 
                     previousMatch.HomeMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", previousMatch.HomeTeam.TeamId).ToList();
                     previousMatch.VisitorMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", previousMatch.VisitorTeam.TeamId).ToList();
