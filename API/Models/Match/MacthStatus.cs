@@ -9,7 +9,7 @@ namespace API.Models.Match
     {
         Deleted = -1,
         Pending = 0,
-        Started = 1,
+        Active = 1,
         Finished = 2
     }
 }

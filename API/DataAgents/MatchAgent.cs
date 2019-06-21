@@ -104,6 +104,54 @@ namespace API.DataAgents
             }
         }
 
+        public List<MatchWithTeams> GetActiveMatchs(int userID)
+        {
+            var matchWithTeamsList = new List<MatchWithTeams>();
+
+            var matchs = DataContext.ExecuteQuery<Match>("Match/GetActiveMatchs", userID).ToArray();
+
+            using (var agent = new TeamsAgent())
+            {
+                foreach (var match in matchs)
+                {
+                    var matchwithTeam = new MatchWithTeams();
+
+                    matchwithTeam.Match = match;
+
+                    matchwithTeam.HomeTeam = agent.GetTeam(match.HomeTeamId.Value);
+                    matchwithTeam.VisitorTeam = agent.GetTeam(match.VisitorId.Value);
+
+                    matchWithTeamsList.Add(matchwithTeam);
+                }
+
+                return matchWithTeamsList;
+            }
+        }
+
+        public MatchWithEvents GetActiveMatchByID(int matchID)
+        {
+            using (var agent = new TeamsAgent(this))
+            {
+                using (var memberAgent = new MembersAgent())
+                {
+                    var previousMatch = new MatchWithEvents();
+
+                    previousMatch.Match = DataContext.ExecuteQuery<Match>("Match/GetActiveMatchsByID", matchID).FirstOrDefault();
+
+                    previousMatch.HomeTeam = agent.GetTeam(previousMatch.Match.HomeTeamId.Value);
+                    previousMatch.VisitorTeam = agent.GetTeam(previousMatch.Match.HomeTeamId.Value);
+
+                    previousMatch.HomeMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", previousMatch.HomeTeam.TeamId).ToList();
+                    previousMatch.VisitorMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", previousMatch.VisitorTeam.TeamId).ToList();
+
+                    // Events
+                    previousMatch.Events = DataContext.ExecuteQuery<MatchEvent>("MatchEvent/GetMatchEventsByID", matchID).ToList();
+
+                    return previousMatch;
+                }
+            }
+        }
+
         public List<MatchWithTeams> GetPreviousMatchs(int userID)
         {
             var matchWithTeamsList = new List<MatchWithTeams>();
@@ -128,13 +176,13 @@ namespace API.DataAgents
             }
         }
 
-        public PreviousMatch GetPreviousMatchByID(int matchID)
+        public MatchWithEvents GetPreviousMatchByID(int matchID)
         {
             using (var agent = new TeamsAgent(this))
             {
                 using (var memberAgent = new MembersAgent())
                 {
-                    var previousMatch = new PreviousMatch();
+                    var previousMatch = new MatchWithEvents();
 
                     previousMatch.Match = DataContext.ExecuteQuery<Match>("Match/GetPreviousMatchsByID", matchID).FirstOrDefault();
 
@@ -161,7 +209,5 @@ namespace API.DataAgents
         {
             DataContext.ExecuteInsertFromQuery("MatchEvent/CreateMatchEvent", userID, (int)eventsType, matchId, teamId, memberId, description, matchTime);
         }
-
-
     }
 }

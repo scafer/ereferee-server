@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace API.Models.Match
 {
-    public class PreviousMatch
+    public class MatchWithEvents
     {
         public Match Match { get; set; }
         public Team HomeTeam { get; set; }
