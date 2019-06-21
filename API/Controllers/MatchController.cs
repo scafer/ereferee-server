@@ -183,6 +183,43 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        [Route("getActiveMatchs")]
+        [Authorize]
+        public ActionResult<List<MatchWithTeams>> GetActiveMatchs()
+        {
+            var user = User.GetUser();
+
+            if (user != null)
+            {
+                using (var matchAgent = new MatchAgent())
+                {
+                    return matchAgent.GetActiveMatchs(user.UserID);
+                }
+            }
+
+            return new NotFoundResult();
+        }
+
+        [HttpGet]
+        [Route("getActiveMatchByID")]
+        [Authorize]
+        public ActionResult<MatchWithEvents> GetActiveMatchByID(int matchID)
+        {
+            var user = User.GetUser();
+
+            if (user != null)
+            {
+                using (var matchAgent = new MatchAgent())
+                {
+                    return matchAgent.GetActiveMatchByID(matchID);
+                }
+            }
+
+            return new NotFoundResult();
+        }
+
+
+        [HttpGet]
         [Route("getPreviousMatchs")]
         [Authorize]
         public ActionResult<List<MatchWithTeams>> GetPreviousMatchs()
@@ -203,7 +240,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("getPreviousMatchByID")]
         [Authorize]
-        public ActionResult<PreviousMatch> GetPreviousMatchByID(int matchID)
+        public ActionResult<MatchWithEvents> GetPreviousMatchByID(int matchID)
         {
             var user = User.GetUser();
 
