@@ -157,9 +157,9 @@ namespace API.DataAgents
             DataContext.ExecuteInsertFromQuery("Match/AssociateUserToMatch", userId ,matchId, role);
         }
 
-        public void CreateMatchEvent(MatchEventsType eventsType, int matchId, int? teamId, int? memberId, string description)
+        public void CreateMatchEvent(int userID, MatchEventsType eventsType, int matchId, int? teamId, int? memberId, string description, string matchTime)
         {
-            DataContext.ExecuteInsertFromQuery("MatchEvent/CreateMatchEvent", (int)eventsType, matchId, teamId, memberId, description);
+            DataContext.ExecuteInsertFromQuery("MatchEvent/CreateMatchEvent", userID, (int)eventsType, matchId, teamId, memberId, description, matchTime);
         }
 
 
