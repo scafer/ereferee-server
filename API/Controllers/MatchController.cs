@@ -222,7 +222,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("createMatchEvents")]
         [Authorize]
-        public ActionResult<bool> CreateMatchEvents(MatchEventsType eventType, int matchID, int? teamId, int? memberId, string description)
+        public ActionResult<bool> CreateMatchEvents(MatchEventsType eventType, int matchID, int? teamId, int? memberId, string description, string matchTime)
         {
             var user = User.GetUser();
 
@@ -230,7 +230,27 @@ namespace API.Controllers
             {
                 using (var matchAgent = new MatchAgent())
                 {
-                    matchAgent.CreateMatchEvent(eventType, matchID, teamId, memberId, description);
+                    matchAgent.CreateMatchEvent(user.UserID, eventType, matchID, teamId, memberId, description, matchTime);
+
+                    return true;
+                }
+            }
+
+            return new NotFoundResult();
+        }
+
+        [HttpPost]
+        [Route("deleteMatch")]
+        [Authorize]
+        public ActionResult<bool> DeleteMatch(int matchID)
+        {
+            var user = User.GetUser();
+
+            if (user != null)
+            {
+                using (var matchAgent = new MatchAgent())
+                {
+                    matchAgent.DeleteMatch(matchID);
 
                     return true;
                 }
