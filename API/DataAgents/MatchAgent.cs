@@ -83,23 +83,25 @@ namespace API.DataAgents
             }
         }
 
-        public MatchWithTeamsAndMembers GetPendingMatchInfoByID(int matchId)
+        public MatchWithEvents GetPendingMatchInfoByID(int matchId)
         {
             using (var agent = new TeamsAgent(this))
             {
                 using (var memberAgent = new MembersAgent())
                 {
-                    var matchWithTeamsAndMembers = new MatchWithTeamsAndMembers();
+                    var matchWithEvents = new MatchWithEvents();
 
-                    matchWithTeamsAndMembers.Match = DataContext.ExecuteQuery<Match>("Match/GetPendingMatchByID", matchId).FirstOrDefault();
+                    matchWithEvents.Match = DataContext.ExecuteQuery<Match>("Match/GetPendingMatchByID", matchId).FirstOrDefault();
 
-                    matchWithTeamsAndMembers.HomeTeam = agent.GetTeam(matchWithTeamsAndMembers.Match.HomeTeamId.Value);
-                    matchWithTeamsAndMembers.VisitorTeam = agent.GetTeam(matchWithTeamsAndMembers.Match.VisitorId.Value);
+                    matchWithEvents.HomeTeam = agent.GetTeam(matchWithEvents.Match.HomeTeamId.Value);
+                    matchWithEvents.VisitorTeam = agent.GetTeam(matchWithEvents.Match.VisitorId.Value);
 
-                    matchWithTeamsAndMembers.HomeMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", matchWithTeamsAndMembers.HomeTeam.TeamId).ToArray();
-                    matchWithTeamsAndMembers.VisitorMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", matchWithTeamsAndMembers.VisitorTeam.TeamId).ToArray();
+                    matchWithEvents.HomeMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", matchWithEvents.HomeTeam.TeamId).ToList();
+                    matchWithEvents.VisitorMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", matchWithEvents.VisitorTeam.TeamId).ToList();
 
-                    return matchWithTeamsAndMembers;
+                    matchWithEvents.Events = new List<MatchEvent>();
+
+                    return matchWithEvents;
                 }
             }
         }
