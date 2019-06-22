@@ -50,6 +50,12 @@
     <None Update="DatabaseScripts\Match\FinishMatch.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="DatabaseScripts\Match\GetActiveMatchs.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DatabaseScripts\Match\GetActiveMatchsByID.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="DatabaseScripts\Match\GetMatchStatus.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
