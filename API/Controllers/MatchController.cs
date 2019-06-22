@@ -259,7 +259,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("createMatchEvents")]
         [Authorize]
-        public ActionResult<bool> CreateMatchEvents(MatchEventsType eventType, int matchID, int? teamId, int? memberId, string description, string matchTime)
+        public ActionResult<bool> CreateMatchEvents(MatchEventsType eventType, int matchID, int? memberId, string description, string matchTime)
         {
             var user = User.GetUser();
 
@@ -267,7 +267,7 @@ namespace API.Controllers
             {
                 using (var matchAgent = new MatchAgent())
                 {
-                    matchAgent.CreateMatchEvent(user.UserID, eventType, matchID, teamId, memberId, description, matchTime);
+                    matchAgent.CreateMatchEvent(user.UserID, eventType, matchID, memberId, description, matchTime);
 
                     return true;
                 }

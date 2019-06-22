@@ -139,7 +139,7 @@ namespace API.DataAgents
                     previousMatch.Match = DataContext.ExecuteQuery<Match>("Match/GetActiveMatchsByID", matchID).FirstOrDefault();
 
                     previousMatch.HomeTeam = agent.GetTeam(previousMatch.Match.HomeTeamId.Value);
-                    previousMatch.VisitorTeam = agent.GetTeam(previousMatch.Match.HomeTeamId.Value);
+                    previousMatch.VisitorTeam = agent.GetTeam(previousMatch.Match.VisitorId.Value);
 
                     previousMatch.HomeMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", previousMatch.HomeTeam.TeamId).ToList();
                     previousMatch.VisitorMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", previousMatch.VisitorTeam.TeamId).ToList();
@@ -187,7 +187,7 @@ namespace API.DataAgents
                     previousMatch.Match = DataContext.ExecuteQuery<Match>("Match/GetPreviousMatchsByID", matchID).FirstOrDefault();
 
                     previousMatch.HomeTeam = agent.GetTeam(previousMatch.Match.HomeTeamId.Value);
-                    previousMatch.VisitorTeam = agent.GetTeam(previousMatch.Match.HomeTeamId.Value);
+                    previousMatch.VisitorTeam = agent.GetTeam(previousMatch.Match.VisitorId.Value);
 
                     previousMatch.HomeMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", previousMatch.HomeTeam.TeamId).ToList();
                     previousMatch.VisitorMembers = DataContext.ExecuteQuery<TeamMember>("Member/GetMembersInfo", previousMatch.VisitorTeam.TeamId).ToList();
@@ -205,9 +205,9 @@ namespace API.DataAgents
             DataContext.ExecuteInsertFromQuery("Match/AssociateUserToMatch", userId ,matchId, role);
         }
 
-        public void CreateMatchEvent(int userID, MatchEventsType eventsType, int matchId, int? teamId, int? memberId, string description, string matchTime)
+        public void CreateMatchEvent(int userID, MatchEventsType eventsType, int matchId, int? memberId, string description, string matchTime)
         {
-            DataContext.ExecuteInsertFromQuery("MatchEvent/CreateMatchEvent", userID, (int)eventsType, matchId, teamId, memberId, description, matchTime);
+            DataContext.ExecuteInsertFromQuery("MatchEvent/CreateMatchEvent", userID, (int)eventsType, matchId, memberId, description, matchTime);
         }
     }
 }
