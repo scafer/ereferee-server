@@ -167,7 +167,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("getPendingMatchByID")]
         [Authorize]
-        public ActionResult<MatchWithTeamsAndMembers> GetPendingMatchByID(int matchID)
+        public ActionResult<MatchWithEvents> GetPendingMatchByID(int matchID)
         {
             var user = User.GetUser();
 
