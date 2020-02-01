@@ -11,8 +11,6 @@ namespace ereferee.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        AuthService authService = new AuthService();
-
         [HttpPost]
         [Route("resetPassword")]
         public ActionResult<string> ResetPassword(string username, string email)
@@ -28,10 +26,8 @@ namespace ereferee.Controllers
         [Route("changePassword")]
         public ActionResult<string> ChangePassword(string oldPassword, string newPassword)
         {
-            using (var service = new UserService())
-            {
-                return service.ChangePassword(oldPassword, newPassword) ? "true" : "false";
-            }
+            using var service = new UserService();
+            return service.ChangePassword(oldPassword, newPassword) ? "true" : "false";
         }
 
         [HttpGet]
@@ -43,10 +39,8 @@ namespace ereferee.Controllers
 
             if (user != null)
             {
-                using (var service = new UserService())
-                {
-                    return service.GetUsers();
-                }
+                using var service = new UserService();
+                return service.GetUsers();
             }
 
             return null;

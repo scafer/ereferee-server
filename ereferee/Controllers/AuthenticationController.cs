@@ -9,45 +9,34 @@ namespace ereferee.Controllers
     [Route("api/[controller]")]
     public class AuthenticationController : ControllerBase
     {
-        AuthService authService = new AuthService();
-
         [HttpPost]
         [AllowAnonymous]
         [Route("signIn")]
         public ActionResult<AuthData> SignIn(User userData)
         {
-            User user;
-            using (var service = new AuthService())
-            {
-                user = service.SignIn(userData);
-            }
+            using var service = new AuthService();
+            var user = service.SignIn(userData);
 
             if (user != null)
             {
-                var token = authService.GetAuthData(user.id);
+                var token = service.GetAuthData(user.id);
                 return token;
             }
+
             return new NotFoundResult();
         }
 
         [HttpPost]
         [AllowAnonymous]
         [Route("signUp")]
-        public ActionResult<string> SignUp(User user)
+        public ActionResult<Result> SignUp(User user)
         {
-            var userService = new UserService();
-            var authService = new AuthService();
+            using var userService = new UserService();
+            using var authService = new AuthService();
 
-            var checkEmail = userService.CheckEmailExist(user.email);
-            if (checkEmail) return "Email already in use.";
-
-            var checkUsername = userService.CheckUsernameExist(user.username);
-            if (checkUsername) return "Username already in use.";
-
-            bool userAdded = authService.SignUp(user);
-            if (!userAdded) return "An error occurred while adding the user.";
-
-            return "User added successfully";
+            if (userService.CheckEmailExist(user.email)) return Result.Get(1, "Email in use");
+            if (userService.CheckUsernameExist(user.username)) return Result.Get(1, "User in use");
+            return !authService.SignUp(user) ? Result.Get(1, "Error while adding user") : Result.Get(0, "User added");
         }
     }
 }
