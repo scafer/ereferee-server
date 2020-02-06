@@ -1,8 +1,8 @@
 ﻿using ereferee.Helpers;
 using ereferee.Models;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace ereferee.Services
 {
@@ -15,11 +15,11 @@ namespace ereferee.Services
             db = new DataContext();
         }
 
-        public void AddUser(User usr)
+        public User CreateUser(User user)
         {
-            var user = new User { username = usr.username, password = usr.password, email = usr.email };
             db.users.Add(user);
             db.SaveChanges();
+            return user;
         }
 
         public User GetUser(string username)

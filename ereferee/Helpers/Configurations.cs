@@ -5,7 +5,7 @@ using System.IO;
 
 namespace ereferee.Helpers
 {
-    public class GetConfigurations
+    public class Configurations
     {
         public static IConfigurationBuilder GetAppSettings()
         {

@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ereferee.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class AuthenticationController : ControllerBase
     {
         [HttpPost]
@@ -19,7 +19,7 @@ namespace ereferee.Controllers
 
             if (user != null)
             {
-                var token = service.GetAuthData(user.id);
+                var token = TokenService.GenerateToken(user);
                 return token;
             }
 
@@ -29,14 +29,22 @@ namespace ereferee.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("signUp")]
-        public ActionResult<Result> SignUp(User user)
+        public ActionResult<SvcResult> SignUp(User user)
         {
             using var userService = new UserService();
             using var authService = new AuthService();
 
-            if (userService.CheckEmailExist(user.email)) return Result.Get(1, "Email in use");
-            if (userService.CheckUsernameExist(user.username)) return Result.Get(1, "User in use");
-            return !authService.SignUp(user) ? Result.Get(1, "Error while adding user") : Result.Get(0, "User added");
+            if (userService.CheckEmailExist(user.email)) return SvcResult.Get(1, "Email in use");
+            if (userService.CheckUsernameExist(user.username)) return SvcResult.Get(1, "User in use");
+            return !authService.SignUp(user) ? SvcResult.Get(1, "Error while adding user") : SvcResult.Get(0, "Success");
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("authenticated")]
+        public ActionResult<SvcResult> Authenticated()
+        {
+            return SvcResult.Get(0, "Success");
         }
     }
 }
