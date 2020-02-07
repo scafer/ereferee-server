@@ -14,7 +14,7 @@ namespace ereferee.Controllers
         [Authorize]
         [Route("createGame")]
         [DisableRequestSizeLimit]
-        public ActionResult<GameData> CreateGame([FromBody] GameData gameData)
+        public ActionResult<GameData> CreateGame([FromBody] Game game)
         {
             var user = User.GetUser();
 
@@ -111,7 +111,7 @@ namespace ereferee.Controllers
         [HttpPost]
         [Authorize]
         [Route("finishGame")]
-        public ActionResult<SvcResult> FinishGame(int gameId, int homeScore, int visitorScore)
+        public ActionResult<SvcResult> FinishGame(Game gm)
         {
             var user = User.GetUser();
 
@@ -120,12 +120,12 @@ namespace ereferee.Controllers
                 return new NotFoundResult();
             }
 
-            if (gameId != 0)
+            if (gm.id != 0)
             {
                 using var gameService = new GameService();
-                var game = gameService.GetGame(gameId);
-                game.homeScore = homeScore;
-                game.visitorScore = visitorScore;
+                var game = gameService.GetGame(gm.id);
+                game.homeScore = gm.homeScore;
+                game.visitorScore = gm.visitorScore;
 
                 if (game.status == 1)
                 {
@@ -204,7 +204,7 @@ namespace ereferee.Controllers
         [HttpPost]
         [Route("registerEvent")]
         [Authorize]
-        public ActionResult<SvcResult> RegisterEvent(EventType eventType, int gameId, int? athleteId, string description, string gameTime)
+        public ActionResult<SvcResult> RegisterEvent(GameEvent gameEvent)
         {
             var user = User.GetUser();
 
@@ -214,17 +214,6 @@ namespace ereferee.Controllers
             }
 
             using var gameService = new GameService();
-
-            var gameEvent = new GameEvent();
-            gameEvent.reg = description;
-            gameEvent.gameId = gameId;
-            gameEvent.time = gameTime;
-            gameEvent.eventDescription = eventType.ToString();
-            gameEvent.userId = user.id;
-
-            if(athleteId != null)
-                gameEvent.athleteId = int.Parse(athleteId.ToString());
-
             gameService.RegisterEvent(gameEvent);
 
             return SvcResult.Get(0, "Success");            
