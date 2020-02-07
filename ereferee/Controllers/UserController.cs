@@ -12,10 +12,10 @@ namespace ereferee.Controllers
     {
         [HttpPost]
         [Route("resetPassword")]
-        public ActionResult<SvcResult> ResetPassword(string username, string email)
+        public ActionResult<SvcResult> ResetPassword(User user)
         {
             using var service = new UserService();
-            var result = service.ResetPassword(username, email);
+            var result = service.ResetPassword(user.username, user.email);
 
             if (result)
                 return SvcResult.Get(0, "Success");
