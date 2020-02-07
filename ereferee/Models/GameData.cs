@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+#nullable enable
 namespace ereferee.Models
 {
     public class GameData
