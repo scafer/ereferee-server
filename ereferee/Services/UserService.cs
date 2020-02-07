@@ -1,8 +1,8 @@
 ﻿using ereferee.Helpers;
 using ereferee.Models;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ereferee.Services
 {

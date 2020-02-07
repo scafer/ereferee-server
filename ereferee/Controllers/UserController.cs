@@ -1,8 +1,8 @@
 ﻿using ereferee.Models;
 using ereferee.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 
 namespace ereferee.Controllers
 {
@@ -64,8 +64,11 @@ namespace ereferee.Controllers
                 return new NotFoundResult();
             }
 
+            /*
             using var service = new UserService();
             return service.GetUsers();
+            */
+            return new NotFoundResult();
         }
     }
 }

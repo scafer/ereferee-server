@@ -9,6 +9,6 @@ namespace ereferee.Models
         public Team? visitorTeam { get; set; }
         public List<Athlete>? homeAthletes { get; set; }
         public List<Athlete>? visitorAthletes { get; set; }
-        public List<Event>? events { get; set; }
+        public List<GameEvent>? events { get; set; }
     }
 }

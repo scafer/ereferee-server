@@ -1,8 +1,8 @@
 ﻿using ereferee.Models;
 using ereferee.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ereferee.Controllers
 {
@@ -98,9 +98,9 @@ namespace ereferee.Controllers
                 using var gameService = new GameService();
                 var game = gameService.GetGame(gameId);
 
-                if(game.status == 0)
+                if (game.status == 0)
                 {
-                    gameService.StartGame(gameId);
+                    gameService.StartGame(game);
                     return new SvcResult(0, "Success");
                 }
             }
@@ -122,7 +122,16 @@ namespace ereferee.Controllers
 
             if (gameId != 0)
             {
+                using var gameService = new GameService();
+                var game = gameService.GetGame(gameId);
+                game.homeScore = homeScore;
+                game.visitorScore = visitorScore;
 
+                if (game.status == 1)
+                {
+                    gameService.FinishGame(game);
+                    return new SvcResult(0, "Success");
+                }
             }
 
             return new NotFoundResult();
@@ -131,7 +140,7 @@ namespace ereferee.Controllers
         [HttpGet]
         [Authorize]
         [Route("pendingGames")]
-        public ActionResult<List<GameData>> PendingGames()
+        public ActionResult<List<Game>> PendingGames()
         {
             var user = User.GetUser();
 
@@ -140,28 +149,14 @@ namespace ereferee.Controllers
                 return new NotFoundResult();
             }
 
-            return new NotFoundResult();
-        }
-
-        [HttpGet]
-        [Authorize]
-        [Route("pendingGameById")]
-        public ActionResult<GameData> PendingGameById(int id)
-        {
-            var user = User.GetUser();
-
-            if (user == null)
-            {
-                return new NotFoundResult();
-            }
-
-            return new NotFoundResult();
+            using var gameService = new GameService();
+            return gameService.GetGames(user.id, 0);
         }
 
         [HttpGet]
         [Authorize]
         [Route("activeGames")]
-        public ActionResult<List<GameData>> ActiveGames()
+        public ActionResult<List<Game>> ActiveGames()
         {
             var user = User.GetUser();
 
@@ -170,28 +165,14 @@ namespace ereferee.Controllers
                 return new NotFoundResult();
             }
 
-            return new NotFoundResult();
-        }
-
-        [HttpGet]
-        [Authorize]
-        [Route("activeGameById")]
-        public ActionResult<GameData> ActiveGameById(int id)
-        {
-            var user = User.GetUser();
-
-            if (user == null)
-            {
-                return new NotFoundResult();
-            }
-
-            return new NotFoundResult();
+            using var gameService = new GameService();
+            return gameService.GetGames(user.id, 1);
         }
 
         [HttpGet]
         [Authorize]
         [Route("previousGames")]
-        public ActionResult<List<GameData>> PreviousGames()
+        public ActionResult<List<Game>> PreviousGames()
         {
             var user = User.GetUser();
 
@@ -200,13 +181,14 @@ namespace ereferee.Controllers
                 return new NotFoundResult();
             }
 
-            return new NotFoundResult();
+            using var gameService = new GameService();
+            return gameService.GetGames(user.id, 2);
         }
 
         [HttpGet]
         [Authorize]
-        [Route("previousGameById")]
-        public ActionResult<GameData> PreviousGameById(int id)
+        [Route("gameDataById")]
+        public ActionResult<GameData> GameDataById(int gameId)
         {
             var user = User.GetUser();
 
@@ -215,7 +197,8 @@ namespace ereferee.Controllers
                 return new NotFoundResult();
             }
 
-            return new NotFoundResult();
+            using var gameService = new GameService();
+            return gameService.GetGameDataById(gameId, user.id);
         }
 
         [HttpPost]
@@ -230,13 +213,27 @@ namespace ereferee.Controllers
                 return new NotFoundResult();
             }
 
-            return new NotFoundResult();
+            using var gameService = new GameService();
+
+            var gameEvent = new GameEvent();
+            gameEvent.reg = description;
+            gameEvent.gameId = gameId;
+            gameEvent.time = gameTime;
+            gameEvent.eventDescription = eventType.ToString();
+            gameEvent.userId = user.id;
+
+            if(athleteId != null)
+                gameEvent.athleteId = int.Parse(athleteId.ToString());
+
+            gameService.RegisterEvent(gameEvent);
+
+            return SvcResult.Get(0, "Success");            
         }
 
         [HttpDelete]
         [Authorize]
         [Route("deleteGame")]
-        public ActionResult<SvcResult> DeleteGame(int id)
+        public ActionResult<SvcResult> DeleteGame(int gameId)
         {
             var user = User.GetUser();
 
@@ -245,7 +242,10 @@ namespace ereferee.Controllers
                 return new NotFoundResult();
             }
 
-            return new NotFoundResult();
+            using var gameService = new GameService();
+            var game = gameService.GetGame(gameId);
+            gameService.DeleteGame(game);
+            return SvcResult.Get(0, "Success");
         }
     }
 }
