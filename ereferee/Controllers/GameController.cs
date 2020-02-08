@@ -1,8 +1,8 @@
 ﻿using ereferee.Models;
 using ereferee.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 
 namespace ereferee.Controllers
 {
@@ -216,7 +216,7 @@ namespace ereferee.Controllers
             using var gameService = new GameService();
             gameService.RegisterEvent(gameEvent);
 
-            return SvcResult.Get(0, "Success");            
+            return SvcResult.Get(0, "Success");
         }
 
         [HttpDelete]

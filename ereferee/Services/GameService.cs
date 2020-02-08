@@ -61,7 +61,7 @@ namespace ereferee.Services
                 using var db1 = new DataContext();
                 var game = db1.games.Where(g => g.id == usrgm.gameId && g.status == status).FirstOrDefault();
 
-                if(game != null)
+                if (game != null)
                     games.Add(game);
             }
 
