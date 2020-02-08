@@ -46,7 +46,7 @@ namespace ereferee
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
-                    Title = "eScout - Server",
+                    Title = "eReferee - Server",
                     Version = "v1",
                     Contact = new OpenApiContact
                     {
