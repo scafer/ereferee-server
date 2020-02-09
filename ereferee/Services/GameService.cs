@@ -74,11 +74,11 @@ namespace ereferee.Services
 
             if (db.userGames.Where(g => g.userId == userId && g.gameId == gameId) != null)
             {
-                gameData.game = db.games.Where(g => g.id == gameId).FirstOrDefault();
-                gameData.homeTeam = db.teams.Where(g => g.id == gameData.game.homeTeamId).FirstOrDefault();
-                gameData.visitorTeam = db.teams.Where(g => g.id == gameData.game.visitorTeamId).FirstOrDefault();
-                gameData.homeAthletes = db.athletes.Where(g => g.teamId == gameData.homeTeam.id).ToList<Athlete>();
-                gameData.visitorAthletes = db.athletes.Where(g => g.teamId == gameData.visitorTeam.id).ToList<Athlete>();
+                gameData.game = db.games.FirstOrDefault(g => g.id == gameId);
+                gameData.homeTeam = db.teams.FirstOrDefault(g => g.id == gameData.game.homeTeamId);
+                gameData.visitorTeam = db.teams.FirstOrDefault(g => g.id == gameData.game.visitorTeamId);
+                gameData.homeAthletes = db.teamAthletes.Where(g => g.teamId == gameData.homeTeam.id).ToList<TeamAthlete>();
+                gameData.visitorAthletes = db.teamAthletes.Where(g => g.teamId == gameData.visitorTeam.id).ToList<TeamAthlete>();
                 gameData.events = db.gameEvents.Where(g => g.gameId == gameData.game.id).ToList<GameEvent>();
             }
 

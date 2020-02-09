@@ -68,6 +68,7 @@ namespace ereferee.Models
     public class TeamAthlete
     {
         public int id { get; set; }
+        public string name { get; set; }
         public int teamId { get; set; }
         public int athleteId { get; set; }
         public string status { get; set; }

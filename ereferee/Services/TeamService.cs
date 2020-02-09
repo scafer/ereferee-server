@@ -19,9 +19,9 @@ namespace ereferee.Services
             return team;
         }
 
-        public List<Athlete> CreateAthletes(List<Athlete> athletes, int gameId, int teamId, AthleteType player)
+        public List<TeamAthlete> CreateAthletes(List<TeamAthlete> athletes, int gameId, int teamId, AthleteType player)
         {
-            foreach (Athlete a in athletes)
+            foreach (TeamAthlete a in athletes)
             {
                 a.teamId = teamId;
                 var athlete = CreateAthlete(a);
@@ -38,9 +38,12 @@ namespace ereferee.Services
             return athletes;
         }
 
-        public Athlete CreateAthlete(Athlete athlete)
+        public TeamAthlete CreateAthlete(TeamAthlete athlete)
         {
-            db.athletes.Add(athlete);
+            Athlete a = new Athlete { name = athlete.name, teamId = athlete.teamId };
+            db.athletes.Add(a);
+            athlete.athleteId = a.id;
+            db.teamAthletes.Add(athlete);
             db.SaveChanges();
             return athlete;
         }

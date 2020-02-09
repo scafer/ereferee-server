@@ -8,8 +8,8 @@ namespace ereferee.Models
         public Game? game { get; set; }
         public Team? homeTeam { get; set; }
         public Team? visitorTeam { get; set; }
-        public List<Athlete>? homeAthletes { get; set; }
-        public List<Athlete>? visitorAthletes { get; set; }
+        public List<TeamAthlete>? homeAthletes { get; set; }
+        public List<TeamAthlete>? visitorAthletes { get; set; }
         public List<GameEvent>? events { get; set; }
     }
 }
