@@ -75,6 +75,7 @@ namespace ereferee.Models
         public string role { get; set; }
         public int number { get; set; }
         public string dayStart { get; set; }
+        public string dayEnd { get; set; }
     }
 
     public class UserGame
