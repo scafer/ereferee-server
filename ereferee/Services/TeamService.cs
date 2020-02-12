@@ -38,14 +38,12 @@ namespace ereferee.Services
             return athletes;
         }
 
-        public TeamAthlete CreateAthlete(TeamAthlete athlete)
+        public Athlete CreateAthlete(TeamAthlete athlete)
         {
             Athlete a = new Athlete { name = athlete.name, teamId = athlete.teamId };
             db.athletes.Add(a);
-            athlete.athleteId = a.id;
-            db.teamAthletes.Add(athlete);
             db.SaveChanges();
-            return athlete;
+            return a;
         }
     }
 }
