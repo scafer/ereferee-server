@@ -39,12 +39,14 @@ CREATE TABLE "events" (
 
 CREATE TABLE "teamAthletes" (
   "id" SERIAL PRIMARY KEY,
+  "name" varchar,
   "teamId" int,
   "athleteId" int,
   "status" varchar,
   "role" varchar,
   "number" int,
-  "dayStart" varchar
+  "dayStart" varchar,
+  "dayEnd" varchar
 );
 
 CREATE TABLE "userGames" (
