@@ -93,6 +93,7 @@ namespace ereferee.Models
         public int userId { get; set; }
         public int athleteId { get; set; }
         public string time { get; set; }
+        public int eventType { get; set; }
         public string eventDescription { get; set; }
         public string reg { get; set; }
     }
