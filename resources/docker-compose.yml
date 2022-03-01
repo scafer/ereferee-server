@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  postgres:
+    container_name: ereferee-postgres
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./sql/database.sql:/docker-entrypoint-initdb.d/1-schema.sql
+    ports:
+      - "5432:5432"
+    restart: always
+    networks:
+      - default
+
+  ereferee-server:
+    depends_on:
+      - postgres
+    ports:
+      - "8090:80"
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres:5432/postgres
+      - DEFAULT_USER_ACCESS_LEVEL=2
+    build:
+      context: ../ereferee/
+      dockerfile: ./Dockerfile
